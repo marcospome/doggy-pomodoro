@@ -1,0 +1,202 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", "Inter", sans-serif;
+
+  /* Use CSS variables for colors tied to the active mode and theme */
+  --color-mode-bg: var(--theme-mode-bg);
+  --color-mode-text: var(--theme-mode-text);
+  --color-mode-btn-text: var(--theme-mode-btn-text);
+  --color-mode-hex: var(--theme-mode-hex);
+}
+
+/* 
+  Themes Definition
+*/
+
+/* Default (Pastel/Light) */
+:root {
+  --pastel-pomodoro-bg: #ffe4e6;
+  --pastel-pomodoro-text: #e11d48;
+  --pastel-pomodoro-btn-text: #be123c;
+  --pastel-pomodoro-hex: #e11d48;
+
+  --pastel-short-bg: #d1fae5;
+  --pastel-short-text: #059669;
+  --pastel-short-btn-text: #047857;
+  --pastel-short-hex: #059669;
+
+  --pastel-long-bg: #dbeafe;
+  --pastel-long-text: #2563eb;
+  --pastel-long-btn-text: #1d4ed8;
+  --pastel-long-hex: #2563eb;
+
+  --glass-bg: rgba(255, 255, 255, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-btn-bg: rgba(255, 255, 255, 0.6);
+  --glass-btn-hover: rgba(255, 255, 255, 0.8);
+  --glass-btn-active: rgba(255, 255, 255, 0.9);
+  --text-main: #1e293b;
+  /* slate-800 */
+  --text-muted: #64748b;
+  /* slate-500 */
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  --pastel-pomodoro-bg: #4c1d95;
+  /* Deep purple */
+  --pastel-pomodoro-text: #c4b5fd;
+  --pastel-pomodoro-btn-text: #ede9fe;
+  --pastel-pomodoro-hex: #8b5cf6;
+
+  --pastel-short-bg: #064e3b;
+  /* Deep emerald */
+  --pastel-short-text: #6ee7b7;
+  --pastel-short-btn-text: #d1fae5;
+  --pastel-short-hex: #10b981;
+
+  --pastel-long-bg: #1e3a8a;
+  /* Deep blue */
+  --pastel-long-text: #93c5fd;
+  --pastel-long-btn-text: #bfdbfe;
+  --pastel-long-hex: #3b82f6;
+
+  --glass-bg: rgba(15, 23, 42, 0.6);
+  /* slate-900 */
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-btn-bg: rgba(30, 41, 59, 0.6);
+  /* slate-800 */
+  --glass-btn-hover: rgba(51, 65, 85, 0.8);
+  /* slate-700 */
+  --glass-btn-active: rgba(71, 85, 105, 0.9);
+  /* slate-600 */
+  --text-main: #f8fafc;
+  /* slate-50 */
+  --text-muted: #cbd5e1;
+  /* slate-300 */
+}
+
+/* Matte Theme */
+[data-theme="matte"] {
+  --pastel-pomodoro-bg: #e6dfd8;
+  /* Warm matte beige */
+  --pastel-pomodoro-text: #8c7b6c;
+  --pastel-pomodoro-btn-text: #5c4e42;
+  --pastel-pomodoro-hex: #a89f91;
+
+  --pastel-short-bg: #d4d7d1;
+  /* Matte sage */
+  --pastel-short-text: #6a7465;
+  --pastel-short-btn-text: #4a5446;
+  --pastel-short-hex: #8a9683;
+
+  --pastel-long-bg: #d0d5d9;
+  /* Matte blue/grey */
+  --pastel-long-text: #657585;
+  --pastel-long-btn-text: #445362;
+  --pastel-long-hex: #879ab0;
+
+  --glass-bg: #f5f3f0;
+  --glass-border: #e0deda;
+  --glass-btn-bg: #eae7e3;
+  --glass-btn-hover: #dfdad4;
+  --glass-btn-active: #d2cdc6;
+  --text-main: #4a4a4a;
+  --text-muted: #828282;
+}
+
+/* High Contrast Theme */
+[data-theme="contrast"] {
+  --pastel-pomodoro-bg: #000000;
+  --pastel-pomodoro-text: #ff0000;
+  --pastel-pomodoro-btn-text: #ff0000;
+  --pastel-pomodoro-hex: #ff0000;
+
+  --pastel-short-bg: #000000;
+  --pastel-short-text: #00ff00;
+  --pastel-short-btn-text: #00ff00;
+  --pastel-short-hex: #00ff00;
+
+  --pastel-long-bg: #000000;
+  --pastel-long-text: #0088ff;
+  --pastel-long-btn-text: #0088ff;
+  --pastel-long-hex: #0088ff;
+
+  --glass-bg: #111111;
+  --glass-border: #333333;
+  --glass-btn-bg: #222222;
+  --glass-btn-hover: #444444;
+  --glass-btn-active: #555555;
+  --text-main: #ffffff;
+  --text-muted: #aaaaaa;
+}
+
+/* Body and Glass mapping */
+body {
+  transition: background-color 0.5s ease, color 0.5s ease;
+  background-color: var(--theme-mode-bg);
+  color: var(--text-main);
+}
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+}
+
+.glass-button {
+  background: var(--glass-btn-bg);
+  backdrop-filter: blur(5px);
+  border: 1px solid var(--glass-border);
+  transition: all 0.2s ease;
+}
+
+.glass-button:hover {
+  background: var(--glass-btn-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.glass-button:active {
+  transform: translateY(0);
+}
+
+.mode-btn {
+  color: var(--text-main);
+}
+
+.mode-btn.active-mode {
+  background: var(--glass-btn-active);
+  font-weight: 700;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  color: var(--theme-mode-btn-text);
+}
+
+.mode-btn:hover:not(.active-mode) {
+  background: var(--glass-btn-hover);
+}
+
+.timer-text {
+  color: var(--theme-mode-text);
+}
+
+.start-btn {
+  background-color: var(--glass-btn-active);
+  color: var(--theme-mode-hex);
+}
+
+.settings-heading {
+  color: var(--text-main);
+}
+
+.settings-label {
+  color: var(--text-muted);
+}
+
+.settings-input {
+  background-color: var(--glass-btn-bg);
+  border-color: var(--glass-border);
+  color: var(--text-main);
+}
