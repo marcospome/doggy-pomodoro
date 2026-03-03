@@ -200,3 +200,114 @@ body {
   border-color: var(--glass-border);
   color: var(--text-main);
 }
+
+/* 
+  Starry Night Background 
+  A seamless tiling dark starry sky with shooting stars
+*/
+
+body.active-starry-night {
+  background-color: #0b1021 !important;
+  color: #f8fafc !important;
+  transition: background-color 1s ease-in-out;
+  overflow-x: hidden;
+}
+
+body.active-starry-night::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200vw;
+  height: 200vh;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+
+  /* Create an infinite seamless pattern of stars using radial gradients */
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 40px 70px, rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 50px 160px, rgba(255, 255, 255, 0.6), rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 90px 40px, rgba(255, 255, 255, 0.4), rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 130px 80px, #ffffff, rgba(0, 0, 0, 0)),
+    radial-gradient(1.5px 1.5px at 160px 120px, rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0)),
+    radial-gradient(2px 2px at 180px 20px, rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 200px 180px, #ffffff, rgba(0, 0, 0, 0)),
+    radial-gradient(1.5px 1.5px at 240px 50px, rgba(255, 255, 255, 0.9), rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 280px 150px, rgba(255, 255, 255, 0.7), rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 300px 90px, rgba(255, 255, 255, 0.4), rgba(0, 0, 0, 0)),
+    radial-gradient(2px 2px at 350px 130px, #ffffff, rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 380px 40px, rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0)),
+    /* More density */
+    radial-gradient(1px 1px at 10px 190px, rgba(255, 255, 255, 0.6), rgba(0, 0, 0, 0)),
+    radial-gradient(1.5px 1.5px at 70px 110px, rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 110px 190px, rgba(255, 255, 255, 0.9), rgba(0, 0, 0, 0)),
+    radial-gradient(2px 2px at 150px 10px, rgba(255, 255, 255, 0.4), rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 220px 130px, rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 260px 20px, rgba(255, 255, 255, 0.6), rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 320px 170px, rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 360px 80px, rgba(255, 255, 255, 0.7), rgba(0, 0, 0, 0));
+  background-repeat: repeat;
+  background-size: 400px 200px;
+
+  animation: fade-in-stars 2s ease forwards, drift-bg-stars 40s linear infinite;
+}
+
+/* Shooting star wrappers */
+body.active-starry-night::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  background: transparent;
+  pointer-events: none;
+  opacity: 0;
+  animation: fade-in-stars 2s ease forwards, shooting-stars-1 6s linear infinite;
+}
+
+@keyframes drift-bg-stars {
+  from {
+    transform: translate(0, 0);
+  }
+
+  /* Translate exactly the background size to create a seamless infinite loop */
+  to {
+    transform: translate(-400px, -200px);
+  }
+}
+
+@keyframes shooting-stars-1 {
+  0% {
+    box-shadow: 120vw -20vh #fff, 140vw 30vh #fff, 80vw -40vh rgba(255, 255, 255, 0.8);
+    opacity: 0;
+  }
+
+  5% {
+    box-shadow: -10vw 80vh #fff, -20vw 120vh #fff, -50vw 80vh rgba(255, 255, 255, 0.8);
+    opacity: 1;
+  }
+
+  8% {
+    box-shadow: -10vw 80vh #fff, -20vw 120vh #fff, -50vw 80vh rgba(255, 255, 255, 0.8);
+    opacity: 0;
+  }
+
+  100% {
+    box-shadow: -10vw 80vh #fff, -20vw 120vh #fff, -50vw 80vh rgba(255, 255, 255, 0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in-stars {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

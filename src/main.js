@@ -1,6 +1,5 @@
 import './style.css'
 
-// --- State & Config ---
 const Settings = {
   pomodoro: 25,
   short: 5,
@@ -10,7 +9,12 @@ const Settings = {
     pomodoro: null, // { bg: '#...', text: '#...', btnText: '#...', hex: '#...', glass: '#...' }
     short: null,
     long: null
-  }
+  },
+  bones: 0,
+  unlockedBackgrounds: ['default'],
+  activeBackground: 'default',
+  unlockedAvatars: ['dachshund'],
+  activeAvatar: 'dachshund'
 };
 
 // Preset Themes
@@ -49,6 +53,7 @@ const btnStart = document.getElementById('btn-start');
 const btnReset = document.getElementById('btn-reset');
 const modeBtns = document.querySelectorAll('.mode-btn');
 const avatarPulse = document.getElementById('avatar-pulse');
+const doggyAvatar = document.getElementById('doggy-avatar');
 
 // Modal Elements
 const modalBackdrop = document.getElementById('modal-backdrop');
@@ -66,6 +71,28 @@ const settingsModeLabel = document.getElementById('settings-mode-label');
 const inputColorBg = document.getElementById('input-color-bg');
 const inputColorGlass = document.getElementById('input-color-glass');
 const inputColorAccent = document.getElementById('input-color-accent');
+
+// Store Elements
+const btnStore = document.getElementById('btn-store');
+const storeModalBackdrop = document.getElementById('store-modal-backdrop');
+const storeModal = document.getElementById('store-modal');
+const btnCloseStore = document.getElementById('btn-close-store');
+const bonesBalanceTop = document.getElementById('bones-balance-top');
+const bonesBalanceModal = document.getElementById('bones-balance-modal');
+
+// Starry Elements
+const starryActionsBuy = document.getElementById('starry-actions-buy');
+const starryActionsOwned = document.getElementById('starry-actions-owned');
+const btnBuyStarry = document.getElementById('btn-buy-starry');
+const btnEquipStarry = document.getElementById('btn-equip-starry');
+const btnSellStarry = document.getElementById('btn-sell-starry');
+
+// Poodle Elements
+const poodleActionsBuy = document.getElementById('poodle-actions-buy');
+const poodleActionsOwned = document.getElementById('poodle-actions-owned');
+const btnBuyPoodle = document.getElementById('btn-buy-poodle');
+const btnEquipPoodle = document.getElementById('btn-equip-poodle');
+const btnSellPoodle = document.getElementById('btn-sell-poodle');
 
 // --- Initialization ---
 function init() {
@@ -86,8 +113,16 @@ function loadSettings() {
     if (parsed.customColors) {
       Settings.customColors = parsed.customColors;
     }
+    Settings.bones = parseInt(parsed.bones) || 0;
+    Settings.unlockedBackgrounds = parsed.unlockedBackgrounds || ['default'];
+    Settings.activeBackground = parsed.activeBackground || 'default';
+    Settings.unlockedAvatars = parsed.unlockedAvatars || ['dachshund'];
+    Settings.activeAvatar = parsed.activeAvatar || 'dachshund';
   }
   resetTimer();
+  updateBonesDisplay();
+  applyActiveBackground();
+  applyActiveAvatar();
 }
 
 // --- Helper Functions ---
@@ -163,6 +198,14 @@ function completeTimer() {
   pauseTimer();
   const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
   audio.play().catch(e => console.log('Audio play prevented by browser', e));
+
+  // Reward bones for completing a Pomodoro
+  if (currentMode === 'pomodoro') {
+    Settings.bones += 50;
+    updateBonesDisplay();
+    saveSettingsInternal(); // Silent save
+  }
+
   resetTimer();
 }
 
@@ -277,7 +320,12 @@ function saveSettings() {
       short: Settings.short,
       long: Settings.long,
       theme: Settings.theme,
-      customColors: Settings.customColors
+      customColors: Settings.customColors,
+      bones: Settings.bones,
+      unlockedBackgrounds: Settings.unlockedBackgrounds,
+      activeBackground: Settings.activeBackground,
+      unlockedAvatars: Settings.unlockedAvatars,
+      activeAvatar: Settings.activeAvatar
     }));
 
     resetTimer();
@@ -286,6 +334,210 @@ function saveSettings() {
   } else {
     alert("Please enter valid times greater than 0.");
   }
+}
+
+// Silent save for internal updates (like earning bones or equipping items)
+function saveSettingsInternal() {
+  localStorage.setItem('doggy-pomodoro-settings', JSON.stringify({
+    pomodoro: Settings.pomodoro,
+    short: Settings.short,
+    long: Settings.long,
+    theme: Settings.theme,
+    customColors: Settings.customColors,
+    bones: Settings.bones,
+    unlockedBackgrounds: Settings.unlockedBackgrounds,
+    activeBackground: Settings.activeBackground,
+    unlockedAvatars: Settings.unlockedAvatars,
+    activeAvatar: Settings.activeAvatar
+  }));
+}
+
+// --- Store Logic ---
+function updateBonesDisplay() {
+  bonesBalanceTop.textContent = `${Settings.bones} 🦴`;
+  bonesBalanceModal.textContent = Settings.bones;
+  updateStoreUI();
+}
+
+function updateStoreUI() {
+  const isUnlocked = Settings.unlockedBackgrounds.includes('starry');
+  const isEquipped = Settings.activeBackground === 'starry';
+
+  if (isUnlocked) {
+    starryActionsBuy.classList.add('hidden');
+    starryActionsBuy.classList.remove('block');
+    starryActionsOwned.classList.remove('hidden');
+    starryActionsOwned.classList.add('flex');
+
+    if (isEquipped) {
+      btnEquipStarry.textContent = 'Unequip';
+      btnEquipStarry.classList.replace('bg-blue-600', 'bg-slate-600');
+      btnEquipStarry.classList.replace('hover:bg-blue-700', 'hover:bg-slate-700');
+    } else {
+      btnEquipStarry.textContent = 'Equip';
+      btnEquipStarry.classList.replace('bg-slate-600', 'bg-blue-600');
+      btnEquipStarry.classList.replace('hover:bg-slate-700', 'hover:bg-blue-700');
+    }
+  } else {
+    starryActionsBuy.classList.remove('hidden');
+    starryActionsBuy.classList.add('block');
+    starryActionsOwned.classList.add('hidden');
+    starryActionsOwned.classList.remove('flex');
+
+    // Disable buy if not enough bones
+    if (Settings.bones < 100) {
+      btnBuyStarry.classList.add('opacity-50', 'cursor-not-allowed');
+    } else {
+      btnBuyStarry.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+  }
+
+  // --- Poodle Avatar Store UI Logic ---
+  const isPoodleUnlocked = Settings.unlockedAvatars.includes('poodle');
+  const isPoodleEquipped = Settings.activeAvatar === 'poodle';
+
+  if (isPoodleUnlocked) {
+    poodleActionsBuy.classList.add('hidden');
+    poodleActionsBuy.classList.remove('block');
+    poodleActionsOwned.classList.remove('hidden');
+    poodleActionsOwned.classList.add('flex');
+
+    if (isPoodleEquipped) {
+      btnEquipPoodle.textContent = 'Unequip';
+      btnEquipPoodle.classList.replace('bg-blue-600', 'bg-slate-600');
+      btnEquipPoodle.classList.replace('hover:bg-blue-700', 'hover:bg-slate-700');
+    } else {
+      btnEquipPoodle.textContent = 'Equip';
+      btnEquipPoodle.classList.replace('bg-slate-600', 'bg-blue-600');
+      btnEquipPoodle.classList.replace('hover:bg-slate-700', 'hover:bg-blue-700');
+    }
+  } else {
+    poodleActionsBuy.classList.remove('hidden');
+    poodleActionsBuy.classList.add('block');
+    poodleActionsOwned.classList.add('hidden');
+    poodleActionsOwned.classList.remove('flex');
+
+    // Disable buy if not enough bones (Poodle is 150)
+    if (Settings.bones < 50) {
+      btnBuyPoodle.classList.add('opacity-50', 'cursor-not-allowed');
+    } else {
+      btnBuyPoodle.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+  }
+}
+
+function handleBuyStarry() {
+  if (Settings.bones >= 100 && !Settings.unlockedBackgrounds.includes('starry')) {
+    Settings.bones -= 100;
+    Settings.unlockedBackgrounds.push('starry');
+    Settings.activeBackground = 'starry'; // auto equip
+    saveSettingsInternal();
+    updateBonesDisplay();
+    applyActiveBackground();
+  } else if (Settings.bones < 100) {
+    // Visual shake or alert for lack of funds
+    btnBuyStarry.classList.add('animate-pulse');
+    setTimeout(() => btnBuyStarry.classList.remove('animate-pulse'), 500);
+  }
+}
+
+function handleEquipToggleStarry() {
+  if (Settings.activeBackground === 'starry') {
+    // Unequip
+    Settings.activeBackground = 'default';
+  } else {
+    // Equip
+    Settings.activeBackground = 'starry';
+  }
+  saveSettingsInternal();
+  updateStoreUI();
+  applyActiveBackground();
+}
+
+function handleSellStarry() {
+  if (Settings.unlockedBackgrounds.includes('starry')) {
+    // Sell for half price (50 bones)
+    Settings.bones += 50;
+    Settings.unlockedBackgrounds = Settings.unlockedBackgrounds.filter(bg => bg !== 'starry');
+    if (Settings.activeBackground === 'starry') {
+      Settings.activeBackground = 'default';
+    }
+    saveSettingsInternal();
+    updateBonesDisplay();
+    applyActiveBackground();
+  }
+}
+
+function applyActiveBackground() {
+  if (Settings.activeBackground === 'starry') {
+    document.body.classList.add('active-starry-night');
+  } else {
+    document.body.classList.remove('active-starry-night');
+  }
+}
+
+// --- Poodle Logic ---
+function handleBuyPoodle() {
+  if (Settings.bones >= 50 && !Settings.unlockedAvatars.includes('poodle')) {
+    Settings.bones -= 50;
+    Settings.unlockedAvatars.push('poodle');
+    Settings.activeAvatar = 'poodle'; // auto equip
+    saveSettingsInternal();
+    updateBonesDisplay();
+    applyActiveAvatar();
+  } else if (Settings.bones < 50) {
+    // Visual shake or alert for lack of funds
+    btnBuyPoodle.classList.add('animate-pulse');
+    setTimeout(() => btnBuyPoodle.classList.remove('animate-pulse'), 500);
+  }
+}
+
+function handleEquipTogglePoodle() {
+  if (Settings.activeAvatar === 'poodle') {
+    // Unequip (revert to dachshund)
+    Settings.activeAvatar = 'dachshund';
+  } else {
+    // Equip
+    Settings.activeAvatar = 'poodle';
+  }
+  saveSettingsInternal();
+  updateStoreUI();
+  applyActiveAvatar();
+}
+
+function handleSellPoodle() {
+  if (Settings.unlockedAvatars.includes('poodle')) {
+    // Sell for half price (75 bones)
+    Settings.bones += 25;
+    Settings.unlockedAvatars = Settings.unlockedAvatars.filter(av => av !== 'poodle');
+    if (Settings.activeAvatar === 'poodle') {
+      Settings.activeAvatar = 'dachshund';
+    }
+    saveSettingsInternal();
+    updateBonesDisplay();
+    applyActiveAvatar();
+  }
+}
+
+function applyActiveAvatar() {
+  if (Settings.activeAvatar === 'poodle') {
+    doggyAvatar.src = './poodle.png';
+  } else {
+    doggyAvatar.src = './dachshund.png';
+  }
+}
+
+function openStore() {
+  storeModalBackdrop.classList.remove('pointer-events-none', 'opacity-0');
+  storeModal.classList.remove('scale-95', 'opacity-0');
+  storeModal.classList.add('scale-100', 'opacity-100');
+  updateBonesDisplay();
+}
+
+function closeStore() {
+  storeModalBackdrop.classList.add('pointer-events-none', 'opacity-0');
+  storeModal.classList.add('scale-95', 'opacity-0');
+  storeModal.classList.remove('scale-100', 'opacity-100');
 }
 
 // --- Event Listeners ---
@@ -313,6 +565,23 @@ function setupEventListeners() {
 
   selectTheme.addEventListener('change', handlePresetThemeChange);
   btnSaveSettings.addEventListener('click', saveSettings);
+
+  // Store Event Listeners
+  btnStore.addEventListener('click', () => {
+    pauseTimer();
+    openStore();
+  });
+  btnCloseStore.addEventListener('click', closeStore);
+  storeModalBackdrop.addEventListener('click', (e) => {
+    if (e.target === storeModalBackdrop) closeStore();
+  });
+  btnBuyStarry.addEventListener('click', handleBuyStarry);
+  btnEquipStarry.addEventListener('click', handleEquipToggleStarry);
+  btnSellStarry.addEventListener('click', handleSellStarry);
+
+  btnBuyPoodle.addEventListener('click', handleBuyPoodle);
+  btnEquipPoodle.addEventListener('click', handleEquipTogglePoodle);
+  btnSellPoodle.addEventListener('click', handleSellPoodle);
 }
 
 // Run app
