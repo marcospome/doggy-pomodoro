@@ -87,6 +87,13 @@ const btnBuyStarry = document.getElementById('btn-buy-starry');
 const btnEquipStarry = document.getElementById('btn-equip-starry');
 const btnSellStarry = document.getElementById('btn-sell-starry');
 
+// HP Elements
+const hpActionsBuy = document.getElementById('hp-actions-buy');
+const hpActionsOwned = document.getElementById('hp-actions-owned');
+const btnBuyHp = document.getElementById('btn-buy-hp');
+const btnEquipHp = document.getElementById('btn-equip-hp');
+const btnSellHp = document.getElementById('btn-sell-hp');
+
 // Poodle Elements
 const poodleActionsBuy = document.getElementById('poodle-actions-buy');
 const poodleActionsOwned = document.getElementById('poodle-actions-owned');
@@ -392,6 +399,38 @@ function updateStoreUI() {
     }
   }
 
+  // --- HP Background Store UI Logic ---
+  const isHpUnlocked = Settings.unlockedBackgrounds.includes('hp');
+  const isHpEquipped = Settings.activeBackground === 'hp';
+
+  if (isHpUnlocked) {
+    hpActionsBuy.classList.add('hidden');
+    hpActionsBuy.classList.remove('block');
+    hpActionsOwned.classList.remove('hidden');
+    hpActionsOwned.classList.add('flex');
+
+    if (isHpEquipped) {
+      btnEquipHp.textContent = 'Unequip';
+      btnEquipHp.classList.replace('bg-blue-600', 'bg-slate-600');
+      btnEquipHp.classList.replace('hover:bg-blue-700', 'hover:bg-slate-700');
+    } else {
+      btnEquipHp.textContent = 'Equip';
+      btnEquipHp.classList.replace('bg-slate-600', 'bg-blue-600');
+      btnEquipHp.classList.replace('hover:bg-slate-700', 'hover:bg-blue-700');
+    }
+  } else {
+    hpActionsBuy.classList.remove('hidden');
+    hpActionsBuy.classList.add('block');
+    hpActionsOwned.classList.add('hidden');
+    hpActionsOwned.classList.remove('flex');
+
+    if (Settings.bones < 150) {
+      btnBuyHp.classList.add('opacity-50', 'cursor-not-allowed');
+    } else {
+      btnBuyHp.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+  }
+
   // --- Poodle Avatar Store UI Logic ---
   const isPoodleUnlocked = Settings.unlockedAvatars.includes('poodle');
   const isPoodleEquipped = Settings.activeAvatar === 'poodle';
@@ -469,10 +508,50 @@ function handleSellStarry() {
 }
 
 function applyActiveBackground() {
+  document.body.classList.remove('active-starry-night', 'active-hp-magic');
   if (Settings.activeBackground === 'starry') {
     document.body.classList.add('active-starry-night');
+  } else if (Settings.activeBackground === 'hp') {
+    document.body.classList.add('active-hp-magic');
+  }
+}
+
+// --- HP Magic Logic ---
+function handleBuyHp() {
+  if (Settings.bones >= 100 && !Settings.unlockedBackgrounds.includes('hp')) {
+    Settings.bones -= 100;
+    Settings.unlockedBackgrounds.push('hp');
+    Settings.activeBackground = 'hp'; // auto equip
+    saveSettingsInternal();
+    updateBonesDisplay();
+    applyActiveBackground();
+  } else if (Settings.bones < 100) {
+    btnBuyHp.classList.add('animate-pulse');
+    setTimeout(() => btnBuyHp.classList.remove('animate-pulse'), 500);
+  }
+}
+
+function handleEquipToggleHp() {
+  if (Settings.activeBackground === 'hp') {
+    Settings.activeBackground = 'default';
   } else {
-    document.body.classList.remove('active-starry-night');
+    Settings.activeBackground = 'hp';
+  }
+  saveSettingsInternal();
+  updateStoreUI();
+  applyActiveBackground();
+}
+
+function handleSellHp() {
+  if (Settings.unlockedBackgrounds.includes('hp')) {
+    Settings.bones += 50;
+    Settings.unlockedBackgrounds = Settings.unlockedBackgrounds.filter(bg => bg !== 'hp');
+    if (Settings.activeBackground === 'hp') {
+      Settings.activeBackground = 'default';
+    }
+    saveSettingsInternal();
+    updateBonesDisplay();
+    applyActiveBackground();
   }
 }
 
@@ -578,6 +657,10 @@ function setupEventListeners() {
   btnBuyStarry.addEventListener('click', handleBuyStarry);
   btnEquipStarry.addEventListener('click', handleEquipToggleStarry);
   btnSellStarry.addEventListener('click', handleSellStarry);
+
+  btnBuyHp.addEventListener('click', handleBuyHp);
+  btnEquipHp.addEventListener('click', handleEquipToggleHp);
+  btnSellHp.addEventListener('click', handleSellHp);
 
   btnBuyPoodle.addEventListener('click', handleBuyPoodle);
   btnEquipPoodle.addEventListener('click', handleEquipTogglePoodle);

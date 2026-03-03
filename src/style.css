@@ -311,3 +311,57 @@ body.active-starry-night::after {
     opacity: 1;
   }
 }
+
+/* Hogwarts Magic Background */
+body.active-hp-magic {
+  background: radial-gradient(circle at 50% 100%, #3e101f 0%, #170716 50%, #05040a 100%) !important;
+  color: #fce7b0 !important;
+  transition: background 1s ease-in-out;
+  overflow-x: hidden;
+}
+
+body.active-hp-magic::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(2px 2px at 10vw 20vh, #fdf4d4 100%, transparent 100%),
+    radial-gradient(1px 1px at 30vw 40vh, #b88a44 100%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 60vw 10vh, #dfc264 100%, transparent 100%),
+    radial-gradient(2px 2px at 80vw 50vh, #fdf4d4 100%, transparent 100%),
+    radial-gradient(1px 1px at 90vw 80vh, #b88a44 100%, transparent 100%),
+    radial-gradient(2.5px 2.5px at 40vw 80vh, #dfc264 100%, transparent 100%),
+    radial-gradient(1px 1px at 20vw 70vh, #fdf4d4 100%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 70vw 70vh, #b88a44 100%, transparent 100%);
+  opacity: 0.6;
+  animation: float-magic 10s ease-in-out infinite alternate;
+}
+
+body.active-hp-magic::after {
+  content: "";
+  position: fixed;
+  top: -10vw;
+  right: -10vw;
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(circle, rgba(162, 132, 63, 0.15) 0%, transparent 70%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+@keyframes float-magic {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.4;
+  }
+
+  100% {
+    transform: translateY(-30px) scale(1.05);
+    opacity: 0.8;
+  }
+}
